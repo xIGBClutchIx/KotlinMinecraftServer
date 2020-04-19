@@ -1,4 +1,4 @@
-package me.clutchy.server.packets.client
+package me.clutchy.server.packets.client.status
 
 import me.clutchy.server.packets.ClientPacket
 

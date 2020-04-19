@@ -1,8 +1,13 @@
 package me.clutchy.server.packets
 
 import me.clutchy.server.SocketConnection
-import me.clutchy.server.packets.server.HandshakePacket
-import me.clutchy.server.packets.server.PingPacket
+import me.clutchy.server.extensions.print
+import me.clutchy.server.extensions.toHex
+import me.clutchy.server.extensions.varInt
+import me.clutchy.server.packets.server.login.LoginStartPacket
+import me.clutchy.server.packets.server.status.PingPacket
+import me.clutchy.server.packets.server.status.RequestStatusPacket
+import me.clutchy.server.packets.server.unknown.UnknownHandshakePacket
 import java.io.DataInputStream
 import kotlin.reflect.KClass
 import kotlin.reflect.full.primaryConstructor
@@ -10,18 +15,37 @@ import kotlin.reflect.full.primaryConstructor
 class ServerPacketHandler {
 
     companion object {
-        private val packets: Map<Int, KClass<out ServerPacket>> = mapOf(
-                0 to HandshakePacket::class,
-                1 to PingPacket::class
+        val stateHandler = hashMapOf<SocketConnection, ConnectionState>()
+
+        private val serverPackets: Map<ConnectionState, Map<Int, KClass<out ServerPacket>>> = mapOf(
+                ConnectionState.UNKNOWN to mapOf(
+                        0 to UnknownHandshakePacket::class
+                ),
+                ConnectionState.STATUS to mapOf(
+                        0 to RequestStatusPacket::class,
+                        1 to PingPacket::class
+                ),
+                ConnectionState.LOGIN to mapOf(
+                        0 to LoginStartPacket::class
+                )
         )
 
-        fun managePacket(packetID: Int, data: DataInputStream, connection: SocketConnection): ServerPacket? {
-            val packet = packets[packetID]
-            return if (packet != null) {
-                packet.primaryConstructor?.call(data, connection)
-            } else {
-                null
-            }
+        fun managePacket(packetID: Int, data: DataInputStream, connection: SocketConnection) {
+            val state = stateHandler.getOrDefault(connection, ConnectionState.UNKNOWN)
+            val packet = serverPackets[state]?.get(packetID)
+            if (packet != null) packet.primaryConstructor?.call(data, connection)
         }
+
+        fun setState(connection: SocketConnection, state: Int) {
+            stateHandler[connection] = ConnectionState.values()[state]
+            "(${connection.address}) = ${stateHandler[connection]}".print()
+        }
+    }
+
+    enum class ConnectionState {
+        UNKNOWN,
+        STATUS,
+        LOGIN,
+        PLAY
     }
 }

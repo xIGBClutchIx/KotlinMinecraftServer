@@ -8,6 +8,7 @@ class Server {
     companion object {
         private lateinit var socket: ServerSocket
         private val connections = hashMapOf<Socket, Thread>()
+        var encryption = false
 
         fun start(port: Int) {
             socket = ServerSocket(port)

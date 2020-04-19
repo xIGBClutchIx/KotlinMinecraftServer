@@ -6,7 +6,6 @@ import me.clutchy.server.extensions.toHex
 import me.clutchy.server.extensions.varInt
 import me.clutchy.server.packets.ClientPacket
 import me.clutchy.server.packets.ServerPacketHandler
-import me.clutchy.server.packets.server.HandshakePacket
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.net.Socket
@@ -29,7 +28,7 @@ class SocketConnection(private val socket: Socket): Runnable {
             ServerPacketHandler.managePacket(packetID, data, this)
         }
        "(${address}) -> Disconnected".print()
-        HandshakePacket.stateHandler.remove(this)
+        ServerPacketHandler.stateHandler.remove(this)
         Server.removeConnection(socket)
     }
 
