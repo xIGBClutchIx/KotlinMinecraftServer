@@ -1,6 +1,6 @@
 package me.clutchy.server.packets.server.unknown
 
-import me.clutchy.server.SocketConnection
+import me.clutchy.server.network.SocketConnection
 import me.clutchy.server.extensions.short
 import me.clutchy.server.extensions.string
 import me.clutchy.server.extensions.varInt

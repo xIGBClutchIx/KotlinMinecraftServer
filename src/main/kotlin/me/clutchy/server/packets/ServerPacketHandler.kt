@@ -1,9 +1,7 @@
 package me.clutchy.server.packets
 
-import me.clutchy.server.SocketConnection
+import me.clutchy.server.network.SocketConnection
 import me.clutchy.server.extensions.print
-import me.clutchy.server.extensions.toHex
-import me.clutchy.server.extensions.varInt
 import me.clutchy.server.packets.server.login.LoginStartPacket
 import me.clutchy.server.packets.server.status.PingPacket
 import me.clutchy.server.packets.server.status.RequestStatusPacket

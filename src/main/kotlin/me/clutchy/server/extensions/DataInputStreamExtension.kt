@@ -3,7 +3,6 @@ package me.clutchy.server.extensions
 import java.io.ByteArrayInputStream
 import java.io.DataInputStream
 import java.io.EOFException
-import java.nio.charset.StandardCharsets
 import kotlin.experimental.and
 
 fun DataInputStream.readPacket(): DataInputStream? {
@@ -42,7 +41,7 @@ fun DataInputStream.string(): String {
     } catch (e: EOFException) {
         return ""
     }
-    return String(buf, StandardCharsets.UTF_8)
+    return String(buf, Charsets.UTF_8)
 }
 
 fun DataInputStream.short(): Short {

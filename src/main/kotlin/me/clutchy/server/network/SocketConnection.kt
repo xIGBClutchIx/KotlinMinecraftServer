@@ -1,9 +1,10 @@
-package me.clutchy.server
+package me.clutchy.server.network
 
 import me.clutchy.server.extensions.print
 import me.clutchy.server.extensions.readPacket
 import me.clutchy.server.extensions.toHex
 import me.clutchy.server.extensions.varInt
+import me.clutchy.server.network.Server
 import me.clutchy.server.packets.ClientPacket
 import me.clutchy.server.packets.ServerPacketHandler
 import java.io.DataInputStream

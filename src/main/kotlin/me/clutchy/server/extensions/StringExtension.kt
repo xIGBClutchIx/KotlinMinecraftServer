@@ -1,6 +1,6 @@
 package me.clutchy.server.extensions
 
-import me.clutchy.server.Server
+import me.clutchy.server.network.Server
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.util.*
@@ -15,4 +15,16 @@ fun String.resourceToBase64(): String {
     } catch (e: IOException) {
         ""
     }
+}
+
+fun String.byteArray(size: Int): ByteArray {
+    var valueArray = this.toByteArray(Charsets.UTF_8)
+    if (valueArray.size > size) {
+        valueArray = this.substring(0, size - 1).toByteArray(Charsets.UTF_8)
+    }
+    return valueArray.size.varInt() + valueArray
+}
+
+fun String.byteArray(): ByteArray {
+    return this.byteArray(32766)
 }

@@ -1,4 +1,4 @@
-package me.clutchy.server
+package me.clutchy.server.network
 
 import java.net.ServerSocket
 import java.net.Socket

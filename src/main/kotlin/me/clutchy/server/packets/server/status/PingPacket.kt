@@ -1,6 +1,6 @@
 package me.clutchy.server.packets.server.status
 
-import me.clutchy.server.SocketConnection
+import me.clutchy.server.network.SocketConnection
 import me.clutchy.server.packets.ServerPacket
 import me.clutchy.server.packets.client.status.PongPacket
 import java.io.DataInputStream

@@ -1,4 +1,4 @@
-package me.clutchy.server
+package me.clutchy.server.network
 
 import java.security.KeyPair
 import java.security.KeyPairGenerator

@@ -1,7 +1,7 @@
 package me.clutchy.server.packets.server.login
 
-import me.clutchy.server.Server
-import me.clutchy.server.SocketConnection
+import me.clutchy.server.network.Server
+import me.clutchy.server.network.SocketConnection
 import me.clutchy.server.extensions.string
 import me.clutchy.server.packets.ServerPacket
 import me.clutchy.server.packets.ServerPacketHandler
