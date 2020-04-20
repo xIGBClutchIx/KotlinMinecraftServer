@@ -2,10 +2,11 @@ package me.clutchy.server.packets
 
 import me.clutchy.server.network.SocketConnection
 import me.clutchy.server.extensions.print
-import me.clutchy.server.packets.server.login.LoginStartPacket
-import me.clutchy.server.packets.server.status.PingPacket
-import me.clutchy.server.packets.server.status.RequestStatusPacket
-import me.clutchy.server.packets.server.unknown.UnknownHandshakePacket
+import me.clutchy.server.packets.clientbound.play.JoinGamePacket
+import me.clutchy.server.packets.serverbound.login.LoginStartPacket
+import me.clutchy.server.packets.serverbound.status.PingPacket
+import me.clutchy.server.packets.serverbound.status.RequestStatusPacket
+import me.clutchy.server.packets.serverbound.unknown.UnknownHandshakePacket
 import java.io.DataInputStream
 import kotlin.reflect.KClass
 import kotlin.reflect.full.primaryConstructor
@@ -17,14 +18,14 @@ class ServerPacketHandler {
 
         private val serverPackets: Map<ConnectionState, Map<Int, KClass<out ServerPacket>>> = mapOf(
                 ConnectionState.UNKNOWN to mapOf(
-                        0 to UnknownHandshakePacket::class
+                        0x00 to UnknownHandshakePacket::class
                 ),
                 ConnectionState.STATUS to mapOf(
-                        0 to RequestStatusPacket::class,
-                        1 to PingPacket::class
+                        0x00 to RequestStatusPacket::class,
+                        0x01 to PingPacket::class
                 ),
                 ConnectionState.LOGIN to mapOf(
-                        0 to LoginStartPacket::class
+                        0x00 to LoginStartPacket::class
                 )
         )
 
@@ -37,6 +38,10 @@ class ServerPacketHandler {
         fun setState(connection: SocketConnection, state: Int) {
             stateHandler[connection] = ConnectionState.values()[state]
             "(${connection.address}) = ${stateHandler[connection]}".print()
+            // Start play
+            if (ConnectionState.values()[state] == ConnectionState.PLAY) {
+                connection.send(JoinGamePacket())
+            }
         }
     }
 

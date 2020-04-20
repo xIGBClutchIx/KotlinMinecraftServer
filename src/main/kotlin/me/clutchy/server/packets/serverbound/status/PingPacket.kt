@@ -1,8 +1,8 @@
-package me.clutchy.server.packets.server.status
+package me.clutchy.server.packets.serverbound.status
 
 import me.clutchy.server.network.SocketConnection
 import me.clutchy.server.packets.ServerPacket
-import me.clutchy.server.packets.client.status.PongPacket
+import me.clutchy.server.packets.clientbound.status.PongPacket
 import java.io.DataInputStream
 
 class PingPacket(data: DataInputStream, connection: SocketConnection): ServerPacket(data, connection) {

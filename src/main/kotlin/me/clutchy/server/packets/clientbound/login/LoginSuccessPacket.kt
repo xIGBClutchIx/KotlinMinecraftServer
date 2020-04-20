@@ -1,10 +1,10 @@
-package me.clutchy.server.packets.client.login
+package me.clutchy.server.packets.clientbound.login
 
 import me.clutchy.server.extensions.byteArray
 import me.clutchy.server.packets.ClientPacket
 import java.util.*
 
-class LoginPacket(private val username: String): ClientPacket(2) {
+class LoginSuccessPacket(private val username: String): ClientPacket(0x02) {
 
     private val uuid = createUUID(username)
 

@@ -1,4 +1,4 @@
-package me.clutchy.server.packets.server.unknown
+package me.clutchy.server.packets.serverbound.unknown
 
 import me.clutchy.server.network.SocketConnection
 import me.clutchy.server.extensions.short

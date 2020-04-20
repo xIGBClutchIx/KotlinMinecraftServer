@@ -2,6 +2,10 @@ package me.clutchy.server.extensions
 
 fun Int.toHex(): String = "0x%02x".format(this)
 
+fun Int.byteArray(): ByteArray {
+    return byteArrayOf(this.toByte())
+}
+
 fun Int.varInt(): ByteArray {
     var array = byteArrayOf()
     var value = this

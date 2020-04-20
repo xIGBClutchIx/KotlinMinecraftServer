@@ -17,10 +17,10 @@ fun String.resourceToBase64(): String {
     }
 }
 
-fun String.byteArray(size: Int): ByteArray {
+fun String.byteArray(maxSize: Int): ByteArray {
     var valueArray = this.toByteArray(Charsets.UTF_8)
-    if (valueArray.size > size) {
-        valueArray = this.substring(0, size - 1).toByteArray(Charsets.UTF_8)
+    if (valueArray.size > maxSize) {
+        valueArray = this.substring(0, maxSize - 1).toByteArray(Charsets.UTF_8)
     }
     return valueArray.size.varInt() + valueArray
 }

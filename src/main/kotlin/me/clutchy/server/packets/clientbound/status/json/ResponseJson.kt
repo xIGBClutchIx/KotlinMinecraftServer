@@ -1,4 +1,4 @@
-package me.clutchy.server.packets.client.status.json
+package me.clutchy.server.packets.clientbound.status.json
 
 import me.clutchy.server.extensions.resourceToBase64
 

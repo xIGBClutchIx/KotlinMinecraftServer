@@ -1,4 +1,4 @@
-package me.clutchy.server.packets.client.login
+package me.clutchy.server.packets.clientbound.login
 
 import me.clutchy.server.network.EncryptionManager
 import me.clutchy.server.extensions.byteArray
@@ -6,7 +6,7 @@ import me.clutchy.server.extensions.varInt
 import me.clutchy.server.packets.ClientPacket
 import java.util.*
 
-class EncryptionRequestPacket: ClientPacket(1) {
+class EncryptionRequestPacket: ClientPacket(0x01) {
 
     private val randomData = ByteArray(4)
 
