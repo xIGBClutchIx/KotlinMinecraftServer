@@ -1,11 +1,17 @@
 package me.clutchy.server.packets
 
 import me.clutchy.server.extensions.print
+import me.clutchy.server.extensions.toHex
 import me.clutchy.server.network.SocketConnection
+import me.clutchy.server.packets.clientbound.login.DisconnectLoginPacket
+import me.clutchy.server.packets.clientbound.login.EncryptionRequestPacket
+import me.clutchy.server.packets.clientbound.login.LoginSuccessPacket
 import me.clutchy.server.packets.clientbound.play.ChatMessagePacket
 import me.clutchy.server.packets.clientbound.play.JoinGamePacket
 import me.clutchy.server.packets.clientbound.play.KeepAlivePacket
 import me.clutchy.server.packets.clientbound.play.PlayerPositionAndLookPacket
+import me.clutchy.server.packets.clientbound.status.PongPacket
+import me.clutchy.server.packets.clientbound.status.ResponsePacket
 import me.clutchy.server.packets.serverbound.login.LoginStartPacket
 import me.clutchy.server.packets.serverbound.status.PingPacket
 import me.clutchy.server.packets.serverbound.status.RequestStatusPacket
@@ -34,7 +40,7 @@ class ServerPacketHandler {
             }, 0, 5000)
         }
 
-        private val serverPackets: Map<ConnectionState, Map<Int, KClass<out ServerPacket>>> = mapOf(
+        private val clientToServerPackets: Map<ConnectionState, Map<Int, KClass<out ServerPacket>>> = mapOf(
                 ConnectionState.UNKNOWN to mapOf(
                         0x00 to UnknownHandshakePacket::class
                 ),
@@ -47,10 +53,33 @@ class ServerPacketHandler {
                 )
         )
 
+        private val serverToClientPackets: Map<ConnectionState, Map<Int, KClass<out ClientPacket>>> = mapOf(
+                ConnectionState.STATUS to mapOf(
+                        0x00 to ResponsePacket::class,
+                        0x01 to PongPacket::class
+                ),
+                ConnectionState.LOGIN to mapOf(
+                        0x00 to DisconnectLoginPacket::class,
+                        0x00 to EncryptionRequestPacket::class,
+                        0x00 to LoginSuccessPacket::class
+                ),
+                ConnectionState.PLAY to mapOf(
+                        0x0F to ChatMessagePacket::class,
+                        0x21 to KeepAlivePacket::class,
+                        0x26 to JoinGamePacket::class,
+                        0x36 to PlayerPositionAndLookPacket::class
+                )
+        )
+
         fun managePacket(packetID: Int, data: DataInputStream, connection: SocketConnection) {
             val state = stateHandler.getOrDefault(connection, ConnectionState.UNKNOWN)
-            val packet = serverPackets[state]?.get(packetID)
-            if (packet != null) packet.primaryConstructor?.call(data, connection)
+            val packet = clientToServerPackets[state]?.get(packetID)
+            var packetName = "Unknown"
+            if (packet != null) {
+                packetName = packet.simpleName.toString().removeSuffix("Packet").replace(Regex("(.)([A-Z])"), "$1 $2")
+                packet.primaryConstructor?.call(data, connection)
+            }
+            "(${connection.address}) -> ${packetID.toHex()} [$packetName]".print()
         }
 
         fun setState(connection: SocketConnection, state: Int) {

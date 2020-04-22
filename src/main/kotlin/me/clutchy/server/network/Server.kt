@@ -2,12 +2,14 @@ package me.clutchy.server.network
 
 import java.net.ServerSocket
 import java.net.Socket
+import java.util.concurrent.atomic.AtomicInteger
 
 class Server {
 
     companion object {
         private lateinit var socket: ServerSocket
         private val connections = hashMapOf<Socket, Thread>()
+        val entityCounter = AtomicInteger()
         var encryption = false
 
         fun start(port: Int) {

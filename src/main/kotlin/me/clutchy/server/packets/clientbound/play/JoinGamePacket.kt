@@ -1,8 +1,8 @@
 package me.clutchy.server.packets.clientbound.play
 
-import me.clutchy.server.EIDManager
 import me.clutchy.server.extensions.byteArray
 import me.clutchy.server.extensions.varInt
+import me.clutchy.server.network.Server
 import me.clutchy.server.packets.ClientPacket
 import java.util.*
 
@@ -10,7 +10,7 @@ class JoinGamePacket: ClientPacket(0x26) {
 
     override fun getData(): ByteArray {
         // Entity ID - Int
-        var array = EIDManager.getNextID().byteArray()
+        var array = Server.entityCounter.incrementAndGet().byteArray()
         // Gamemode - Byte
         array += byteArrayOf(0x00)
         // Dimension - Int

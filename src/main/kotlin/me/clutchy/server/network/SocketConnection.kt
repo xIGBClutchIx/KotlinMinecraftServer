@@ -25,18 +25,18 @@ class SocketConnection(private val socket: Socket): Runnable {
                 return
             }
             val packetID = data.varInt()
-            "(${address}) -> ${packetID.toHex()}".print()
             ServerPacketHandler.managePacket(packetID, data, this)
         }
         "(${address}) -> Disconnected".print()
-        "".print()
+        println()
         ServerPacketHandler.stateHandler.remove(this)
         Server.removeConnection(socket)
 
     }
 
     fun send(packet: ClientPacket) {
-        "(${address}) <- ${packet.packetID.toHex()}".print()
+        val packetName = packet::class.simpleName.toString().removeSuffix("Packet").replace(Regex("(.)([A-Z])"), "$1 $2")
+        "(${address}) <- ${packet.packetID.toHex()} [$packetName]".print()
         val outputStream = DataOutputStream(socket.getOutputStream())
         outputStream.write(packet.getPacketData())
         outputStream.flush()
