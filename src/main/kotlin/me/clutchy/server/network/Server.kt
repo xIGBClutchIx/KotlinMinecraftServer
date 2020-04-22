@@ -12,7 +12,6 @@ class Server {
         private val connections = hashMapOf<Socket, Thread>()
         val entityCounter = AtomicInteger()
         var encryption = false
-        val t = TermColors()
 
         fun start(port: Int) {
             socket = ServerSocket(port)

@@ -1,5 +1,6 @@
 package me.clutchy.server.network
 
+import com.github.ajalt.mordant.TermColors
 import me.clutchy.server.extensions.print
 import me.clutchy.server.extensions.readPacket
 import me.clutchy.server.extensions.toHex
@@ -11,7 +12,6 @@ import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.net.Socket
 
-
 class SocketConnection(private val socket: Socket): Runnable {
 
     var address: String = ""
@@ -19,7 +19,7 @@ class SocketConnection(private val socket: Socket): Runnable {
 
     override fun run() {
         address = socket.localAddress.hostAddress
-        Server.t.green("(${address}) -> Connected").print()
+        t.green("(${address}) -> Connected").print()
         while(true) {
             val data = DataInputStream(socket.getInputStream()).readPacket() ?: break
             if (data.available() <= 0) {
@@ -28,7 +28,7 @@ class SocketConnection(private val socket: Socket): Runnable {
             val packetID = data.varInt()
             ServerPacketHandler.managePacket(packetID, data, this)
         }
-        Server.t.red("(${address}) -> Disconnected").print()
+        t.red("(${address}) -> Disconnected").print()
         println()
         ServerPacketHandler.stateHandler.remove(this)
         Server.removeConnection(socket)
@@ -37,9 +37,13 @@ class SocketConnection(private val socket: Socket): Runnable {
 
     fun send(packet: ClientPacket) {
         val packetName = packet::class.simpleName.toString().removeSuffix("Packet").replace(Regex("(.)([A-Z])"), "$1 $2")
-        Server.t.brightBlue("(${address}) <- ${packet.packetID.toHex()} [$packetName]").print()
+        t.brightBlue("(${address}) <- ${packet.packetID.toHex()} [$packetName]").print()
         val outputStream = DataOutputStream(socket.getOutputStream())
         outputStream.write(packet.getPacketData())
         outputStream.flush()
+    }
+
+    companion object {
+        private val t = TermColors()
     }
 }

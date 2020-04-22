@@ -8,7 +8,7 @@ import me.clutchy.server.packets.ServerPacket
 import me.clutchy.server.packets.ServerPacketHandler
 import java.io.DataInputStream
 
-class UnknownHandshakePacket(data: DataInputStream, connection: SocketConnection): ServerPacket(data, connection) {
+class HandshakePacket(data: DataInputStream, connection: SocketConnection): ServerPacket(data, connection) {
 
     var protocolVersion: Int = 0
         private set

@@ -1,8 +1,8 @@
 package me.clutchy.server.packets
 
+import com.github.ajalt.mordant.TermColors
 import me.clutchy.server.extensions.print
 import me.clutchy.server.extensions.toHex
-import me.clutchy.server.network.Server
 import me.clutchy.server.network.SocketConnection
 import me.clutchy.server.packets.clientbound.play.ChatMessagePacket
 import me.clutchy.server.packets.clientbound.play.JoinGamePacket
@@ -11,7 +11,7 @@ import me.clutchy.server.packets.clientbound.play.PlayerPositionAndLookPacket
 import me.clutchy.server.packets.serverbound.login.LoginStartPacket
 import me.clutchy.server.packets.serverbound.status.PingPacket
 import me.clutchy.server.packets.serverbound.status.RequestStatusPacket
-import me.clutchy.server.packets.serverbound.unknown.UnknownHandshakePacket
+import me.clutchy.server.packets.serverbound.unknown.HandshakePacket
 import java.io.DataInputStream
 import java.util.*
 import kotlin.reflect.KClass
@@ -22,6 +22,7 @@ class ServerPacketHandler {
     companion object {
         val stateHandler = hashMapOf<SocketConnection, ConnectionState>()
         private val timer = Timer("Keep-Alive")
+        private val t = TermColors()
 
         init {
             timer.scheduleAtFixedRate(object: TimerTask() {
@@ -37,7 +38,7 @@ class ServerPacketHandler {
 
         private val clientToServerPackets: Map<ConnectionState, Map<Int, KClass<out ServerPacket>>> = mapOf(
                 ConnectionState.UNKNOWN to mapOf(
-                        0x00 to UnknownHandshakePacket::class
+                        0x00 to HandshakePacket::class
                 ),
                 ConnectionState.STATUS to mapOf(
                         0x00 to RequestStatusPacket::class,
@@ -56,12 +57,12 @@ class ServerPacketHandler {
                 packetName = packet.simpleName.toString().removeSuffix("Packet").replace(Regex("(.)([A-Z])"), "$1 $2")
                 packet.primaryConstructor?.call(data, connection)
             }
-            Server.t.brightGreen("(${connection.address}) -> ${packetID.toHex()} [$packetName]").print()
+            t.brightGreen("(${connection.address}) -> ${packetID.toHex()} [$packetName]").print()
         }
 
         fun setState(connection: SocketConnection, state: Int) {
             stateHandler[connection] = ConnectionState.values()[state]
-            Server.t.yellow("(${connection.address}) = ${stateHandler[connection]}").print()
+            t.yellow("(${connection.address}) = ${stateHandler[connection]}").print()
             // Start play
             if (ConnectionState.values()[state] == ConnectionState.PLAY) {
                 connection.send(JoinGamePacket())
