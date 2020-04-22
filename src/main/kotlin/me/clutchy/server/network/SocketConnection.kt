@@ -28,10 +28,11 @@ class SocketConnection(private val socket: Socket): Runnable {
             "(${address}) -> ${packetID.toHex()}".print()
             ServerPacketHandler.managePacket(packetID, data, this)
         }
-        //"(${address}) -> Disconnected".print()
-        //"".print()
-        //ServerPacketHandler.stateHandler.remove(this)
-        //Server.removeConnection(socket)
+        "(${address}) -> Disconnected".print()
+        "".print()
+        ServerPacketHandler.stateHandler.remove(this)
+        Server.removeConnection(socket)
+
     }
 
     fun send(packet: ClientPacket) {

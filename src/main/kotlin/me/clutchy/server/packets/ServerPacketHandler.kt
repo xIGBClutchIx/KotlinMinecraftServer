@@ -1,22 +1,38 @@
 package me.clutchy.server.packets
 
-import me.clutchy.server.network.SocketConnection
 import me.clutchy.server.extensions.print
+import me.clutchy.server.network.SocketConnection
 import me.clutchy.server.packets.clientbound.play.ChatMessagePacket
 import me.clutchy.server.packets.clientbound.play.JoinGamePacket
+import me.clutchy.server.packets.clientbound.play.KeepAlivePacket
 import me.clutchy.server.packets.clientbound.play.PlayerPositionAndLookPacket
 import me.clutchy.server.packets.serverbound.login.LoginStartPacket
 import me.clutchy.server.packets.serverbound.status.PingPacket
 import me.clutchy.server.packets.serverbound.status.RequestStatusPacket
 import me.clutchy.server.packets.serverbound.unknown.UnknownHandshakePacket
 import java.io.DataInputStream
+import java.util.*
 import kotlin.reflect.KClass
 import kotlin.reflect.full.primaryConstructor
+
 
 class ServerPacketHandler {
 
     companion object {
-        private val stateHandler = hashMapOf<SocketConnection, ConnectionState>()
+        val stateHandler = hashMapOf<SocketConnection, ConnectionState>()
+        private val timer = Timer("Keep-Alive")
+
+        init {
+            timer.scheduleAtFixedRate(object: TimerTask() {
+                override fun run() {
+                    for ((connection, state) in stateHandler) {
+                        if (state == ConnectionState.PLAY) {
+                            connection.send(KeepAlivePacket())
+                        }
+                    }
+                }
+            }, 0, 5000)
+        }
 
         private val serverPackets: Map<ConnectionState, Map<Int, KClass<out ServerPacket>>> = mapOf(
                 ConnectionState.UNKNOWN to mapOf(
