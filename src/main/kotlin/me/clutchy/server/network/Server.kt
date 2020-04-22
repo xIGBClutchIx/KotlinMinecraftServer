@@ -1,5 +1,6 @@
 package me.clutchy.server.network
 
+import com.github.ajalt.mordant.TermColors
 import java.net.ServerSocket
 import java.net.Socket
 import java.util.concurrent.atomic.AtomicInteger
@@ -11,6 +12,7 @@ class Server {
         private val connections = hashMapOf<Socket, Thread>()
         val entityCounter = AtomicInteger()
         var encryption = false
+        val t = TermColors()
 
         fun start(port: Int) {
             socket = ServerSocket(port)

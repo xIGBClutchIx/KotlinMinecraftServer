@@ -15,10 +15,11 @@ import java.net.Socket
 class SocketConnection(private val socket: Socket): Runnable {
 
     var address: String = ""
+    var protocolVersion = 0
 
     override fun run() {
         address = socket.localAddress.hostAddress
-        "(${address}) -> Connected".print()
+        Server.t.green("(${address}) -> Connected").print()
         while(true) {
             val data = DataInputStream(socket.getInputStream()).readPacket() ?: break
             if (data.available() <= 0) {
@@ -27,7 +28,7 @@ class SocketConnection(private val socket: Socket): Runnable {
             val packetID = data.varInt()
             ServerPacketHandler.managePacket(packetID, data, this)
         }
-        "(${address}) -> Disconnected".print()
+        Server.t.red("(${address}) -> Disconnected").print()
         println()
         ServerPacketHandler.stateHandler.remove(this)
         Server.removeConnection(socket)
@@ -36,7 +37,7 @@ class SocketConnection(private val socket: Socket): Runnable {
 
     fun send(packet: ClientPacket) {
         val packetName = packet::class.simpleName.toString().removeSuffix("Packet").replace(Regex("(.)([A-Z])"), "$1 $2")
-        "(${address}) <- ${packet.packetID.toHex()} [$packetName]".print()
+        Server.t.brightBlue("(${address}) <- ${packet.packetID.toHex()} [$packetName]").print()
         val outputStream = DataOutputStream(socket.getOutputStream())
         outputStream.write(packet.getPacketData())
         outputStream.flush()

@@ -12,6 +12,7 @@ dependencies {
     implementation(kotlin("reflect"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3")
     implementation("com.google.code.gson:gson:2.8.6")
+    implementation("com.github.ajalt:mordant:1.2.1")
 }
 
 application {

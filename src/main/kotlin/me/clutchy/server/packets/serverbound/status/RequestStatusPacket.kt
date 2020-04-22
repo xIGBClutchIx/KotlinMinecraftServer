@@ -8,6 +8,6 @@ import java.io.DataInputStream
 class RequestStatusPacket(data: DataInputStream, connection: SocketConnection): ServerPacket(data, connection) {
 
     init {
-        connection.send(ResponsePacket())
+        connection.send(ResponsePacket(connection.protocolVersion))
     }
 }

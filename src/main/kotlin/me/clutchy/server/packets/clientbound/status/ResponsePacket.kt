@@ -5,9 +5,9 @@ import me.clutchy.server.extensions.byteArray
 import me.clutchy.server.packets.ClientPacket
 import me.clutchy.server.packets.clientbound.status.json.ResponseJson
 
-class ResponsePacket: ClientPacket(0x00) {
+class ResponsePacket(val protocolVersion: Int): ClientPacket(0x00) {
 
     override fun getData(): ByteArray {
-        return Gson().toJson(ResponseJson()).byteArray()
+        return Gson().toJson(ResponseJson(protocolVersion)).byteArray()
     }
 }

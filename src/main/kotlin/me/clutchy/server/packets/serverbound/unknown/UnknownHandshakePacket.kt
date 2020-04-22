@@ -23,6 +23,7 @@ class UnknownHandshakePacket(data: DataInputStream, connection: SocketConnection
         protocolVersion = data.varInt()
         serverAddress = data.string()
         serverPort = data.short()
+        connection.protocolVersion = protocolVersion
         ServerPacketHandler.setState(connection, data.varInt())
     }
 }
