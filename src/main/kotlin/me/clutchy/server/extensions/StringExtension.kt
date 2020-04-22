@@ -3,6 +3,7 @@ package me.clutchy.server.extensions
 import me.clutchy.server.network.Server
 import java.io.ByteArrayOutputStream
 import java.io.IOException
+import java.nio.ByteBuffer
 import java.util.*
 import javax.imageio.ImageIO
 
@@ -25,6 +26,4 @@ fun String.byteArray(maxSize: Int): ByteArray {
     return valueArray.size.varInt() + valueArray
 }
 
-fun String.byteArray(): ByteArray {
-    return this.byteArray(32766)
-}
+fun String.byteArray(): ByteArray = this.byteArray(32766)

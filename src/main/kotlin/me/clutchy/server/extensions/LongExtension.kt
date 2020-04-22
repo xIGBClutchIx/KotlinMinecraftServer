@@ -1,5 +1,5 @@
 package me.clutchy.server.extensions
 
-fun Long.byteArray(): ByteArray {
-    return byteArrayOf(this.toByte())
-}
+import java.nio.ByteBuffer
+
+fun Long.byteArray(): ByteArray = ByteBuffer.allocate(Long.SIZE_BYTES).putLong(this).array()

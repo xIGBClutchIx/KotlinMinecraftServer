@@ -5,15 +5,12 @@ import me.clutchy.server.extensions.byteArray
 import me.clutchy.server.extensions.varInt
 import me.clutchy.server.packets.ClientPacket
 import java.util.*
-import java.util.concurrent.atomic.AtomicInteger
 
 class JoinGamePacket: ClientPacket(0x26) {
 
-    private val ENTITY_COUNTER = AtomicInteger()
-
     override fun getData(): ByteArray {
         // Entity ID - Int
-        var array = ENTITY_COUNTER.incrementAndGet().byteArray()
+        var array = EIDManager.getNextID().byteArray()
         // Gamemode - Byte
         array += byteArrayOf(0x00)
         // Dimension - Int
@@ -22,7 +19,7 @@ class JoinGamePacket: ClientPacket(0x26) {
         array += Random().nextLong().byteArray()
         // Max Players - Byte
         // Unused - Should still send it?
-        array += byteArrayOf(0x0)
+        array += byteArrayOf(64.toByte())
         // Level Type - UTF/String
         array += "default".byteArray(16)
         // View Distance - VarInt

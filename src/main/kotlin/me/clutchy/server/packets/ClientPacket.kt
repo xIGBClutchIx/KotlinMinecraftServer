@@ -9,6 +9,6 @@ abstract class ClientPacket(val packetID: Int) {
     fun getPacketData(): ByteArray {
         val data = getData()
         val array: ByteArray = packetID.varInt() + data
-        return array.size.varInt() + array
+        return array.varInt()
     }
 }

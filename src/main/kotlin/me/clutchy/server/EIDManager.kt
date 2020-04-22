@@ -1,19 +1,14 @@
 package me.clutchy.server
 
-import kotlin.random.Random
+import java.util.concurrent.atomic.AtomicInteger
 
 class EIDManager {
 
     companion object {
-        private val eids: ArrayList<Int> = arrayListOf()
+        private val ENTITY_COUNTER = AtomicInteger()
 
-        fun randomEntityID(): Int {
-            var id = Random.nextInt(4)
-            while (eids.contains(id)) {
-                id = Random.nextInt(4)
-            }
-            eids.add(id)
-            return id
+        fun getNextID(): Int {
+            return ENTITY_COUNTER.incrementAndGet()
         }
     }
 }

@@ -5,8 +5,4 @@ import java.time.format.DateTimeFormatter
 
 private val formatter = DateTimeFormatter.ofPattern("HH:mm:ss:SSS")
 
-fun Any.print() {
-    val current = LocalDateTime.now()
-    val formatted = current.format(formatter)
-    println("[$formatted] ${toString()}")
-}
+fun Any.print() = println("[${LocalDateTime.now().format(formatter)}] ${toString()}")

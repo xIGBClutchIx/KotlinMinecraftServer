@@ -8,13 +8,13 @@ class LoginSuccessPacket(private val username: String): ClientPacket(0x02) {
 
     private val uuid = createUUID(username)
 
-    private fun createUUID(name: String): UUID {
-        return UUID.nameUUIDFromBytes("OfflinePlayer:$name".toByteArray(Charsets.UTF_8))
-    }
+    private fun createUUID(name: String): UUID = UUID.nameUUIDFromBytes("OfflinePlayer:$name".toByteArray(Charsets.UTF_8))
 
     override fun getData(): ByteArray {
+        // UUID - String
         var array = uuid.toString().byteArray(36)
-        array += username.byteArray(5)
+        // Username - String
+        array += username.byteArray(16)
         return array
     }
 }

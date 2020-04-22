@@ -1,10 +1,10 @@
 package me.clutchy.server.extensions
 
+import java.nio.ByteBuffer
+
 fun Int.toHex(): String = "0x%02x".format(this)
 
-fun Int.byteArray(): ByteArray {
-    return byteArrayOf(this.toByte())
-}
+fun Int.byteArray(): ByteArray = ByteBuffer.allocate(Int.SIZE_BYTES).putInt(this).array()
 
 fun Int.varInt(): ByteArray {
     var array = byteArrayOf()
