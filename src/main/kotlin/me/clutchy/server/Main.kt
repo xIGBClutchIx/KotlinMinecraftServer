@@ -1,10 +1,12 @@
 package me.clutchy.server
 
-import com.github.ajalt.mordant.TermColors
-import me.clutchy.server.extensions.print
 import me.clutchy.server.network.Server
+import me.clutchy.server.network.SocketConnection
+import java.time.LocalDateTime
 
 fun main() {
-    TermColors().bold("Starting Server").print()
+    println(SocketConnection.t.gray("[") +
+            SocketConnection.t.cyan(LocalDateTime.now().format(SocketConnection.formatter)) + SocketConnection.t.gray("] ") +
+            SocketConnection.t.bold("Starting Server"))
     Server.start(12345)
 }

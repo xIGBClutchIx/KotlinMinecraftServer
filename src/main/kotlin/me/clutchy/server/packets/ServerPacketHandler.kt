@@ -1,7 +1,5 @@
 package me.clutchy.server.packets
 
-import com.github.ajalt.mordant.TermColors
-import me.clutchy.server.extensions.print
 import me.clutchy.server.extensions.toHex
 import me.clutchy.server.network.SocketConnection
 import me.clutchy.server.packets.clientbound.play.ChatMessagePacket
@@ -22,7 +20,6 @@ class ServerPacketHandler {
     companion object {
         val stateHandler = hashMapOf<SocketConnection, ConnectionState>()
         private val timer = Timer("Keep-Alive")
-        private val t = TermColors()
 
         init {
             timer.scheduleAtFixedRate(object: TimerTask() {
@@ -52,17 +49,21 @@ class ServerPacketHandler {
         fun managePacket(packetID: Int, data: DataInputStream, connection: SocketConnection) {
             val state = stateHandler.getOrDefault(connection, ConnectionState.UNKNOWN)
             val packet = clientToServerPackets[state]?.get(packetID)
+            var message = "(${packetID.toHex()}) ["
             var packetName = "Unknown"
             if (packet != null) {
                 packetName = packet.simpleName.toString().removeSuffix("Packet").replace(Regex("(.)([A-Z])"), "$1 $2")
                 packet.primaryConstructor?.call(data, connection)
+                message = SocketConnection.t.brightGreen("$message$packetName]")
+            } else {
+                message = SocketConnection.t.magenta("$message$packetName]")
             }
-            t.brightGreen("(${connection.address}) -> ${packetID.toHex()} [$packetName]").print()
+            connection.printSide(SocketConnection.PrintSide.CLIENT_TO_SERVER, message)
         }
 
         fun setState(connection: SocketConnection, state: Int) {
             stateHandler[connection] = ConnectionState.values()[state]
-            t.yellow("(${connection.address}) = ${stateHandler[connection]}").print()
+            connection.printSide(SocketConnection.PrintSide.SIDE, SocketConnection.t.yellow(ConnectionState.values()[state].name))
             // Start play
             if (ConnectionState.values()[state] == ConnectionState.PLAY) {
                 connection.send(JoinGamePacket())

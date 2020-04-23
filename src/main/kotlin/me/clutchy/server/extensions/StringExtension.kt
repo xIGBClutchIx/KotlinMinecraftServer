@@ -3,7 +3,6 @@ package me.clutchy.server.extensions
 import me.clutchy.server.network.Server
 import java.io.ByteArrayOutputStream
 import java.io.IOException
-import java.nio.ByteBuffer
 import java.util.*
 import javax.imageio.ImageIO
 
