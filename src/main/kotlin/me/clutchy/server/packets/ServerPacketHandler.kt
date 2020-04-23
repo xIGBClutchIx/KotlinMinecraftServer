@@ -49,16 +49,15 @@ class ServerPacketHandler {
         fun managePacket(packetID: Int, data: DataInputStream, connection: SocketConnection) {
             val state = stateHandler.getOrDefault(connection, ConnectionState.UNKNOWN)
             val packet = clientToServerPackets[state]?.get(packetID)
-            var message = "(${packetID.toHex()}) ["
+            val message = "(${packetID.toHex()}) ["
             var packetName = "Unknown"
             if (packet != null) {
                 packetName = packet.simpleName.toString().removeSuffix("Packet").replace(Regex("(.)([A-Z])"), "$1 $2")
+                connection.printSide(SocketConnection.PrintSide.CLIENT_TO_SERVER, SocketConnection.t.brightGreen("$message$packetName]"))
                 packet.primaryConstructor?.call(data, connection)
-                message = SocketConnection.t.brightGreen("$message$packetName]")
             } else {
-                message = SocketConnection.t.magenta("$message$packetName]")
+                connection.printSide(SocketConnection.PrintSide.CLIENT_TO_SERVER, SocketConnection.t.magenta("$message$packetName]"))
             }
-            connection.printSide(SocketConnection.PrintSide.CLIENT_TO_SERVER, message)
         }
 
         fun setState(connection: SocketConnection, state: Int) {

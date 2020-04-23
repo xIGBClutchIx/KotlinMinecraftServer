@@ -12,5 +12,5 @@ data class ResponseJson(val protocolVersion: Int, val version: VersionJson = Ver
         data class SamplePlayerJson(val name: String = "Clutch", val id: String = "2a8e267f-88d7-4175-8825-00e81a680076")
     }
 
-    data class DescriptionJson(val text: String = "A Minecraft Server")
+    data class DescriptionJson(val text: String = "A Fake Minecraft Server")
 }

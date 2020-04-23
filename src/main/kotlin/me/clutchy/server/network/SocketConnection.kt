@@ -12,11 +12,11 @@ import java.time.format.DateTimeFormatter
 
 class SocketConnection(private val socket: Socket): Runnable {
 
-    var address: String = ""
+    private var address: String = ""
     var protocolVersion = 0
 
     override fun run() {
-        address = socket.localAddress.hostAddress
+        address = socket.inetAddress.hostAddress
         printSide(PrintSide.CLIENT_TO_SERVER, t.green("Connected"))
         while(true) {
             val data = DataInputStream(socket.getInputStream()).readPacket() ?: break
@@ -66,7 +66,7 @@ class SocketConnection(private val socket: Socket): Runnable {
     }
 
     companion object {
-        val formatter = DateTimeFormatter.ofPattern("HH:mm:ss:SSS")
+        val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss:SSS")
         val t = TermColors()
     }
 }
