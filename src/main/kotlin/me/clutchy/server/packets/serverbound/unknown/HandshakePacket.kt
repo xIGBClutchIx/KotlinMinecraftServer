@@ -4,10 +4,12 @@ import me.clutchy.server.network.SocketConnection
 import me.clutchy.server.extensions.short
 import me.clutchy.server.extensions.string
 import me.clutchy.server.extensions.varInt
+import me.clutchy.server.packets.serverbound.PacketInfo
 import me.clutchy.server.packets.ServerPacket
 import me.clutchy.server.packets.ServerPacketHandler
 import java.io.DataInputStream
 
+@PacketInfo(ServerPacketHandler.ConnectionState.UNKNOWN, 0x00)
 class HandshakePacket(data: DataInputStream, connection: SocketConnection): ServerPacket(data, connection) {
 
     var protocolVersion: Int = 0

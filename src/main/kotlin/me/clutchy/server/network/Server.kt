@@ -1,6 +1,6 @@
 package me.clutchy.server.network
 
-import com.github.ajalt.mordant.TermColors
+import me.clutchy.server.packets.ServerPacketHandler
 import java.net.ServerSocket
 import java.net.Socket
 import java.util.concurrent.atomic.AtomicInteger
@@ -14,6 +14,7 @@ class Server {
         var encryption = false
 
         fun start(port: Int) {
+            ServerPacketHandler.registerServerboundPackets()
             socket = ServerSocket(port)
             while (true) try {
                 val connection: Socket = socket.accept()

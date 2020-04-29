@@ -6,12 +6,12 @@ import me.clutchy.server.packets.clientbound.play.ChatMessagePacket
 import me.clutchy.server.packets.clientbound.play.JoinGamePacket
 import me.clutchy.server.packets.clientbound.play.KeepAlivePacket
 import me.clutchy.server.packets.clientbound.play.PlayerPositionAndLookPacket
-import me.clutchy.server.packets.serverbound.login.LoginStartPacket
-import me.clutchy.server.packets.serverbound.status.PingPacket
-import me.clutchy.server.packets.serverbound.status.RequestStatusPacket
-import me.clutchy.server.packets.serverbound.unknown.HandshakePacket
+import me.clutchy.server.packets.serverbound.PacketInfo
 import java.io.DataInputStream
+import java.io.File
+import java.net.URL
 import java.util.*
+import kotlin.collections.HashMap
 import kotlin.reflect.KClass
 import kotlin.reflect.full.primaryConstructor
 
@@ -20,6 +20,7 @@ class ServerPacketHandler {
     companion object {
         val stateHandler = hashMapOf<SocketConnection, ConnectionState>()
         private val timer = Timer("Keep-Alive")
+        private val serverboundPackets: HashMap<ConnectionState, HashMap<Int, KClass<ServerPacket>>> = hashMapOf()
 
         init {
             timer.scheduleAtFixedRate(object: TimerTask() {
@@ -33,22 +34,32 @@ class ServerPacketHandler {
             }, 0, 10000)
         }
 
-        private val clientToServerPackets: Map<ConnectionState, Map<Int, KClass<out ServerPacket>>> = mapOf(
-                ConnectionState.UNKNOWN to mapOf(
-                        0x00 to HandshakePacket::class
-                ),
-                ConnectionState.STATUS to mapOf(
-                        0x00 to RequestStatusPacket::class,
-                        0x01 to PingPacket::class
-                ),
-                ConnectionState.LOGIN to mapOf(
-                        0x00 to LoginStartPacket::class
-                )
-        )
+        fun registerServerboundPackets() {
+            // Register all states
+            for (state in ConnectionState.values()) serverboundPackets[state] = hashMapOf()
+            // Get serverbound package
+            val packageName = PacketInfo::class.java.packageName
+            var name = packageName
+            // Search for classes
+            if (!name.startsWith("/")) name = "/$name"
+            name = name.replace('.', '/')
+            val url: URL = ServerPacketHandler::class.java.getResource(name)
+            val directory = File(url.file)
+            if (directory.exists()) {
+                directory.walk().filter { f -> f.isFile && !f.name.contains('$') && f.name.endsWith(".class") }.forEach {
+                    val fullyQualifiedClassName = packageName + it.canonicalPath.removePrefix(directory.canonicalPath).dropLast(6).replace('/', '.').replace("\\", ".")
+                    val clazz = Class.forName(fullyQualifiedClassName)
+                    val filter = clazz.kotlin.annotations.filterIsInstance<PacketInfo>()
+                    if (clazz.kotlin.annotations.isNotEmpty() && filter.isNotEmpty()) {
+                        serverboundPackets[filter.first().state]?.put(filter.first().packetID, clazz.kotlin as KClass<ServerPacket>)
+                    }
+                }
+            }
+        }
 
         fun managePacket(packetID: Int, data: DataInputStream, connection: SocketConnection) {
             val state = stateHandler.getOrDefault(connection, ConnectionState.UNKNOWN)
-            val packet = clientToServerPackets[state]?.get(packetID)
+            val packet = serverboundPackets[state]?.get(packetID)
             val message = "(${packetID.toHex()}) ["
             var packetName = "Unknown"
             if (packet != null) {
