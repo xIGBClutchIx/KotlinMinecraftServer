@@ -7,7 +7,6 @@ import me.clutchy.server.packets.clientbound.status.json.ResponseJson
 
 class ResponsePacket(val protocolVersion: Int): ClientPacket(0x00) {
 
-    // TODO: Test
     override fun getData(): ByteArray {
         return Klaxon().toJsonString(ResponseJson(protocolVersion)).byteArray()
     }
