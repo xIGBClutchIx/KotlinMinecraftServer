@@ -2,9 +2,9 @@ package me.clutchy.server.packets.clientbound.login
 
 import me.clutchy.server.packets.ClientPacket
 
-class DisconnectLoginPacket: ClientPacket(0x00) {
+class DisconnectLoginPacket(private val message: String): ClientPacket(0x00) {
 
     override fun getData(): ByteArray {
-        return "{\"text\":\"Get yeeted\",\"color\":\"dark_aqua\"}".toByteArray(Charsets.UTF_8)
+        return "{\"text\":\"$message\",\"color\":\"dark_red\"}".toByteArray(Charsets.UTF_8)
     }
 }

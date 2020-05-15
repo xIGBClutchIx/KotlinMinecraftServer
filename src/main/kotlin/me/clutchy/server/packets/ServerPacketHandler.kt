@@ -34,29 +34,6 @@ class ServerPacketHandler {
             }, 0, 10000)
         }
 
-        fun registerServerboundPackets() {
-            // Register all states
-            for (state in ConnectionState.values()) serverboundPackets[state] = hashMapOf()
-            // Get serverbound package
-            val packageName = PacketInfo::class.java.packageName
-            var name = packageName
-            // Search for classes
-            if (!name.startsWith("/")) name = "/$name"
-            name = name.replace('.', '/')
-            val url: URL = ServerPacketHandler::class.java.getResource(name)
-            val directory = File(url.file)
-            if (directory.exists()) {
-                directory.walk().filter { f -> f.isFile && !f.name.contains('$') && f.name.endsWith(".class") }.forEach {
-                    val fullyQualifiedClassName = packageName + it.canonicalPath.removePrefix(directory.canonicalPath).dropLast(6).replace('/', '.').replace("\\", ".")
-                    val clazz = Class.forName(fullyQualifiedClassName)
-                    val filter = clazz.kotlin.annotations.filterIsInstance<PacketInfo>()
-                    if (clazz.kotlin.annotations.isNotEmpty() && filter.isNotEmpty()) {
-                        serverboundPackets[filter.first().state]?.put(filter.first().packetID, clazz.kotlin as KClass<ServerPacket>)
-                    }
-                }
-            }
-        }
-
         fun managePacket(packetID: Int, data: DataInputStream, connection: SocketConnection) {
             val state = stateHandler.getOrDefault(connection, ConnectionState.UNKNOWN)
             val packet = serverboundPackets[state]?.get(packetID)
@@ -75,10 +52,34 @@ class ServerPacketHandler {
             stateHandler[connection] = ConnectionState.values()[state]
             connection.printSide(SocketConnection.PrintSide.SIDE, SocketConnection.t.yellow(ConnectionState.values()[state].name))
             // Start play
-            if (ConnectionState.values()[state] == ConnectionState.PLAY) {
-                connection.send(JoinGamePacket())
-                connection.send(PlayerPositionAndLookPacket())
-                connection.send(ChatMessagePacket())
+            if (ConnectionState.values()[state] == ConnectionState.PLAY) startGame(connection)
+        }
+
+        private fun startGame(connection: SocketConnection) {
+            connection.send(JoinGamePacket())
+            connection.send(PlayerPositionAndLookPacket())
+            connection.send(ChatMessagePacket())
+        }
+
+        fun registerServerboundPackets() {
+            // Register all states
+            for (state in ConnectionState.values()) serverboundPackets[state] = hashMapOf()
+            // Get serverbound package
+            val packageName = PacketInfo::class.java.packageName
+            var name = packageName
+            // Search for classes
+            if (!name.startsWith("/")) name = "/$name"
+            name = name.replace('.', '/')
+            val url: URL = ServerPacketHandler::class.java.getResource(name)
+            val directory = File(url.file)
+            if (!directory.exists()) return
+            directory.walk().filter { f -> f.isFile && !f.name.contains('$') && f.name.endsWith(".class") }.forEach {
+                val fullyQualifiedClassName = packageName + it.canonicalPath.removePrefix(directory.canonicalPath).dropLast(6).replace('/', '.').replace("\\", ".")
+                val clazz = Class.forName(fullyQualifiedClassName)
+                val filter = clazz.kotlin.annotations.filterIsInstance<PacketInfo>()
+                if (clazz.kotlin.annotations.isNotEmpty() && filter.isNotEmpty()) {
+                    serverboundPackets[filter.first().state]?.put(filter.first().packetID, clazz.kotlin as KClass<ServerPacket>)
+                }
             }
         }
     }

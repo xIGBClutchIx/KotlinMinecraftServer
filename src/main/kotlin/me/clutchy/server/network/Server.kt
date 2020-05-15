@@ -11,7 +11,6 @@ class Server {
         private lateinit var socket: ServerSocket
         private val connections = hashMapOf<Socket, Thread>()
         val entityCounter = AtomicInteger()
-        var encryption = false
 
         fun start(port: Int) {
             ServerPacketHandler.registerServerboundPackets()

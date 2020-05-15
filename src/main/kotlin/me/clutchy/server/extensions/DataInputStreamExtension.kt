@@ -34,14 +34,19 @@ fun DataInputStream.varInt(): Int {
     return result
 }
 
-fun DataInputStream.string(): String {
+fun DataInputStream.byteArray(): ByteArray {
     val buf = ByteArray(this.varInt())
     try {
         this.readFully(buf)
     } catch (e: EOFException) {
-        return ""
+        e.printStackTrace()
+        return byteArray()
     }
-    return String(buf, Charsets.UTF_8)
+    return buf
+}
+
+fun DataInputStream.string(): String {
+    return String(byteArray(), Charsets.UTF_8)
 }
 
 fun DataInputStream.short(): Short {
